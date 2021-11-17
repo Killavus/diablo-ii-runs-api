@@ -1,0 +1,23 @@
+[package]
+name = "runs-api"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = { version = "0.4", default-features = true, features = ["serde"] }
+color-eyre = "0.5"
+dotenv = "0.15"
+log = "0.4"
+nanoid = "0.4"
+sqlx = { version = "0.5", features = ["postgres", "runtime-tokio-rustls", "chrono"] }
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["std", "env-filter", "fmt", "ansi", "registry"] }
+warp = "0.3"
+serde = "1.0"
+serde_json = "1.0"
+strum = "0.22"
+strum_macros = "0.22"
+thiserror = "1.0"

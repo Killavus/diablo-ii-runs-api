@@ -1,0 +1,6 @@
+-- Add up migration script here
+CREATE TABLE IF NOT EXISTS runs (
+    id SERIAL PRIMARY KEY,
+    target TEXT NOT NULL,
+    ran_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
