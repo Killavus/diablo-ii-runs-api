@@ -12,20 +12,15 @@ use warp::Filter;
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case", tag = "type")]
 enum RunTarget {
-    // A1:
     Pit,
     Andariel,
     Cows,
     Countess,
-    // A2:
     ArcaneSanctuary,
     AncientTunnels,
-    // A3:
     Travincal,
     Mephisto,
-    // A4:
     Chaos,
-    // A5:
     Pindle,
     Shenk,
     Eldritch,
@@ -70,14 +65,15 @@ fn create(
     db_pool: sqlx::Pool<Postgres>,
 ) -> impl warp::Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::post()
-        .and(warp::path("runs"))
+        .and(warp::path!("runs" / String))
         .and(warp::body::content_length_limit(1024))
         .and(warp::body::json())
-        .and_then(move |payload| handle_create(db_pool.clone(), payload))
+        .and_then(move |scope, payload| handle_create(db_pool.clone(), scope, payload))
 }
 
 async fn handle_create(
     db_pool: sqlx::Pool<Postgres>,
+    scope: String,
     payload: CreatePayload,
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let mut conn = db_pool.acquire().await.map_err(|err| ApiError::from(err))?;
@@ -85,8 +81,9 @@ async fn handle_create(
 
     let record: Run = sqlx::query_as!(
         Run,
-        r#"INSERT INTO runs (target) VALUES ($1) RETURNING id, target as "target: RunTarget", ran_at"#,
-        target.as_ref()
+        r#"INSERT INTO runs (target, scope) VALUES ($1, $2) RETURNING id, target as "target: RunTarget", ran_at"#,
+        target.as_ref(),
+        scope,
     )
     .fetch_one(&mut conn)
     .await.map_err(|err| ApiError::from(err))?;
@@ -98,16 +95,20 @@ fn list(
     db_pool: sqlx::Pool<Postgres>,
 ) -> impl warp::Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::get()
-        .and(warp::path("runs"))
-        .and_then(move || handle_list(db_pool.clone()))
+        .and(warp::path!("runs" / String))
+        .and_then(move |scope| handle_list(db_pool.clone(), scope))
 }
 
-async fn handle_list(db_pool: sqlx::Pool<Postgres>) -> Result<impl warp::Reply, warp::Rejection> {
+async fn handle_list(
+    db_pool: sqlx::Pool<Postgres>,
+    scope: String,
+) -> Result<impl warp::Reply, warp::Rejection> {
     let mut conn = db_pool.acquire().await.map_err(|err| ApiError::from(err))?;
 
     let record: Vec<Run> = sqlx::query_as!(
         Run,
-        r#"SELECT id, target as "target: RunTarget", ran_at FROM runs"#
+        r#"SELECT id, target as "target: RunTarget", ran_at FROM runs WHERE scope = $1"#,
+        scope
     )
     .fetch_all(&mut conn)
     .await
