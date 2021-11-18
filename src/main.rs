@@ -1,5 +1,8 @@
 use dotenv::dotenv;
-use warp::{wrap_fn, Filter};
+use warp::{
+    hyper::{header, Method},
+    wrap_fn, Filter,
+};
 
 mod api;
 mod context;
@@ -24,9 +27,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let handler_ctx = wrap_fn(context::HandlerCtx::request_id_wrapper);
     let db_pool = database::pool().await?;
 
+    let cors = warp::cors()
+        .allow_headers(vec![header::CONTENT_TYPE])
+        .allow_methods(vec![Method::POST, Method::GET])
+        .allow_origin("http://localhost:3000")
+        .build();
+
     let routes = api::root(db_pool)
         .with(handler_ctx)
-        .with(warp::trace::trace(app_trace));
+        .with(warp::trace::trace(app_trace))
+        .with(cors);
 
     warp::serve(routes).run(([0, 0, 0, 0], 8888)).await;
     Ok(())
