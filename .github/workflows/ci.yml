@@ -1,0 +1,41 @@
+on: [push]
+name: build
+
+jobs:
+  build:
+    name: Build API
+    runs-on: ubuntu-20.04
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install SQLX
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: sqlx-cli
+      - name: Setup database
+        env:
+          DATABASE_URL: postgres://postgres:postgres@postgres/runs_ci
+        run: sqlx database setup
+      - name: Build
+        uses: actions-rs/cargo@v1
+        env:
+          DATABASE_URL: postgres://postgres:postgres@postgres/runs_ci
+        with:
+          command: build
+          args: --release
