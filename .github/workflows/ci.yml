@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install SQLX
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/install@v0.1
         with:
           command: install
           args: sqlx-cli
@@ -56,11 +56,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build-${{ github.sha }}
+          path: "~"
       - name: Rename build
-        run: mv build-${{ github.sha }} runs-api
+        run: mv ~/build-${{ github.sha }} ~/runs-api
       - name: Run SSH Agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.MACHINE_SSH_KEY }}
       - name: Copy to server
-        run: scp -p ${{ secrets.MACHINE_SSH_PORT }} runs-api runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
+        run: scp -p ${{ secrets.MACHINE_SSH_PORT }} ~/runs-api runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
