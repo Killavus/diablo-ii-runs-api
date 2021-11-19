@@ -44,5 +44,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.GITHUB_WORKFLOW }}-${{ env.GITHUB_SHA }}
-          path: ${{ env.GITHUB_WORKSPACE }}/target/release/runs-api
+          path: ${{ github.workspace }}/target/release/runs-api
           retention-days: 1
