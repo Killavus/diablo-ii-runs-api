@@ -5,6 +5,7 @@ jobs:
   build:
     name: Build API
     runs-on: ubuntu-20.04
+    container: node:10.18-jessie
     services:
       postgres:
         image: postgres
