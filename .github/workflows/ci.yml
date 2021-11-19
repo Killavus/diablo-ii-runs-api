@@ -3,7 +3,7 @@ name: build
 
 jobs:
   build:
-    name: Build API
+    name: Build
     runs-on: ubuntu-20.04
     container: node:10.18-jessie
     services:
@@ -46,3 +46,21 @@ jobs:
           name: ${{ github.workflow }}-${{ github.sha }}
           path: ${{ github.workspace }}/target/release/runs-api
           retention-days: 1
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-20.04
+    needs: build
+    if: startsWith(github.event.head_commit.message, 'deploy:')
+    steps:
+      - name: Download build
+        uses: actions/download-artifact@v2
+        with:
+          name: build-${{ github.sha }}
+      - name: Rename build
+        run: mv build-${{ github.sha }} runs-api
+      - name: Run SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.MACHINE_SSH_KEY }}
+      - name: Copy to server
+        run: scp -p ${{ secrets.MACHINE_SSH_PORT }} runs-api runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin

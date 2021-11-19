@@ -1,4 +1,5 @@
 use dotenv::dotenv;
+use std::net::IpAddr;
 use warp::{
     hyper::{header, Method},
     wrap_fn, Filter,
@@ -43,6 +44,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(warp::trace::trace(app_trace))
         .with(cors);
 
-    warp::serve(routes).run(([0, 0, 0, 0], 8888)).await;
+    let listen_addr: IpAddr = std::env::var("RUST_API_LISTEN_ADDR")
+        .unwrap_or("127.0.0.1".into())
+        .parse()?;
+
+    let listen_port = std::env::var("RUST_API_LISTEN_PORT")
+        .unwrap_or("8888".into())
+        .parse()?;
+
+    warp::serve(routes).run((listen_addr, listen_port)).await;
     Ok(())
 }
