@@ -40,3 +40,9 @@ jobs:
         with:
           command: build
           args: --release
+      - name: Save build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.GITHUB_WORKFLOW }}-${{ env.GITHUB_SHA }}
+          path: ${{ env.GITHUB_WORKSPACE }}/target/release/runs-api
+          retention-days: 1
