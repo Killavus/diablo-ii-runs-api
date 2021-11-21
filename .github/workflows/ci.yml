@@ -29,6 +29,12 @@ jobs:
         with:
           command: install
           args: sqlx-cli
+      - name: Save sqlx artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: sqlx-${{ github.sha }}
+          path: ~/.cargo/bin/sqlx
+          retention-days: 1
       - name: Setup database
         env:
           DATABASE_URL: postgres://postgres:postgres@postgres/runs_ci
@@ -57,11 +63,22 @@ jobs:
         with:
           name: build-${{ github.sha }}
           path: "~"
+      - name: Download sqlx
+        uses: actions/download-artifact@v2
+        with:
+          name: sqlx-${{ github.sha }}
+          path: "~"
       - name: Run SSH Agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.MACHINE_SSH_KEY }}
       - name: Add server to known hosts
         run: mkdir -p ~/.ssh; ssh-keyscan -p ${{ secrets.MACHINE_SSH_PORT }} ${{ secrets.MACHINE_HOST }} >> ~/.ssh/known_hosts
-      - name: Copy to server
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Copy migrations to server
+        run: scp -P ${{ secrets.MACHINE_SSH_PORT }} -r ${{ github.workspace }}/migrations runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
+      - name: Copy sqlx to server
+        run: scp -P ${{ secrets.MACHINE_SSH_PORT }} ~/sqlx runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
+      - name: Copy binary to server
         run: scp -P ${{ secrets.MACHINE_SSH_PORT }} ~/runs-api runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
