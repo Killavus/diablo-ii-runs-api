@@ -62,4 +62,4 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.MACHINE_SSH_KEY }}
       - name: Copy to server
-        run: scp -p ${{ secrets.MACHINE_SSH_PORT }} ~/runs-api runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
+        run: scp -P ${{ secrets.MACHINE_SSH_PORT }} ~/runs-api runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
