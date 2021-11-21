@@ -57,10 +57,6 @@ jobs:
         with:
           name: build-${{ github.sha }}
           path: "~"
-      - name: List files
-        run: ls -R ~
-      - name: Rename build
-        run: mv ~/build-${{ github.sha }} ~/runs-api
       - name: Run SSH Agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
