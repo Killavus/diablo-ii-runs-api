@@ -61,5 +61,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.MACHINE_SSH_KEY }}
+      - name: Add server to known hosts
+        run: mkdir -p ~/.ssh; ssh-keyscan -p ${{ secrets.MACHINE_SSH_PORT }} ${{ secrets.MACHINE_HOST }} >> ~/.ssh/known_hosts
       - name: Copy to server
         run: scp -P ${{ secrets.MACHINE_SSH_PORT }} ~/runs-api runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
