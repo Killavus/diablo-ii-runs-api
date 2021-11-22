@@ -83,4 +83,4 @@ jobs:
       - name: Copy binary to server
         run: scp -P ${{ secrets.MACHINE_SSH_PORT }} ~/runs-api runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
       - name: Run migrations
-        run: ssh -p ${{ secrets.MACHINE_SSH_PORT }} runs@${{ secrets.MACHINE_HOST }} "pushd ~/api; bin/sqlx database setup"
+        run: ssh -p ${{ secrets.MACHINE_SSH_PORT }} runs@${{ secrets.MACHINE_HOST }} "pushd ~/api; source ~/.profile; bin/sqlx database setup"
