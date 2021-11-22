@@ -81,6 +81,8 @@ jobs:
       - name: Copy sqlx to server
         run: scp -P ${{ secrets.MACHINE_SSH_PORT }} ~/sqlx runs@${{ secrets.MACHINE_HOST }}:~/api/bin; ssh -p ${{ secrets.MACHINE_SSH_PORT }} runs@${{ secrets.MACHINE_HOST }} "chmod +x ~/api/bin/sqlx"
       - name: Copy binary to server
-        run: scp -P ${{ secrets.MACHINE_SSH_PORT }} ~/runs-api runs@${{ secrets.MACHINE_HOST }}:~/api/bin
+        run: scp -P ${{ secrets.MACHINE_SSH_PORT }} ~/runs-api runs@${{ secrets.MACHINE_HOST }}:~/api/bin; ssh -p ${{ secrets.MACHINE_SSH_PORT }} runs@${{ secrets.MACHINE_HOST }} "chmod +x ~/api/bin/runs-api"
       - name: Run migrations
         run: ssh -p ${{ secrets.MACHINE_SSH_PORT }} runs@${{ secrets.MACHINE_HOST }} "pushd ~/api; source ~/.profile; bin/sqlx database setup"
+      - name: Restart Runs-API
+        run: ssh -p ${{ secrets.MACHINE_SSH_PORT }} runs@${{ secrets.MACHINE_HOST }} "sudo systemctl restart runs-api"

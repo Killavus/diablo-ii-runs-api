@@ -44,11 +44,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(warp::trace::trace(app_trace))
         .with(cors);
 
-    let listen_addr: IpAddr = std::env::var("RUST_API_LISTEN_ADDR")
+    let listen_addr: IpAddr = std::env::var("RUNS_API_LISTEN_ADDR")
         .unwrap_or("127.0.0.1".into())
         .parse()?;
 
-    let listen_port = std::env::var("RUST_API_LISTEN_PORT")
+    let listen_port = std::env::var("RUNS_API_LISTEN_PORT")
         .unwrap_or("8888".into())
         .parse()?;
 
