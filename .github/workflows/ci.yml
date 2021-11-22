@@ -28,7 +28,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: install
-          args: sqlx-cli
+          args: sqlx-cli --features openssl-vendored
       - name: Save sqlx artifact
         uses: actions/upload-artifact@v2
         with:
