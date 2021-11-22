@@ -77,7 +77,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Copy migrations to server
-        run: scp -P ${{ secrets.MACHINE_SSH_PORT }} -r ${{ github.workspace }}/migrations runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
+        run: scp -P ${{ secrets.MACHINE_SSH_PORT }} -r ${{ github.workspace }}/migrations runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin; ssh -p ${{ secrets.MACHINE_SSH_PORT }} runs@${{ secrets.MACHINE_HOST }} "chmod +x ~/api/bin/sqlx"
       - name: Copy sqlx to server
         run: scp -P ${{ secrets.MACHINE_SSH_PORT }} ~/sqlx runs@${{ secrets.MACHINE_HOST }}:/opt/runs/api/bin
       - name: Copy binary to server
